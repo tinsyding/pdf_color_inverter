@@ -68,7 +68,7 @@ def main():
     
     # 启动应用
     print("\n🌐 启动Web服务器...")
-    print("   服务器地址: http://localhost:5000")
+    print("   服务器地址: http://localhost:4999")
     print("   按 Ctrl+C 停止服务器")
     print("-" * 50)
     
@@ -76,7 +76,7 @@ def main():
         # 延迟打开浏览器
         def open_browser():
             time.sleep(2)
-            webbrowser.open('http://localhost:5000')
+            webbrowser.open('http://localhost:4999')
         
         import threading
         browser_thread = threading.Thread(target=open_browser)
@@ -85,7 +85,7 @@ def main():
         
         # 导入并运行Flask应用
         from app import app
-        app.run(debug=False, host='0.0.0.0', port=5000)
+        app.run(debug=False, host='0.0.0.0', port=4999)
         
     except KeyboardInterrupt:
         print("\n\n👋 服务器已停止")

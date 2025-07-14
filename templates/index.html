@@ -23,6 +23,10 @@
                     <h1>PDF 页面反色工具</h1>
                 </div>
                 <p class="subtitle">将PDF页面颜色反转，适合夜间阅读</p>
+                <div style="float:right;margin-top:10px;">
+                    <button class="btn btn-warning" id="clearCacheBtn" style="margin-right:10px;">清理缓存</button>
+                    <button class="btn btn-danger" id="shutdownBtn">退出程序</button>
+                </div>
             </div>
         </header>
 
@@ -55,6 +59,7 @@
                         <button class="btn btn-primary" onclick="event.stopPropagation();document.getElementById('pdfFile').click()">
                             选择文件
                         </button>
+                        <!-- 清理缓存按钮已移至header -->
                     </div>
                 </div>
             </div>
@@ -65,6 +70,7 @@
                     <h3>选择要反色的页面</h3>
                     <div class="preview-controls">
                         <button class="btn btn-secondary" id="toggleSelectBtn" onclick="toggleSelectAll()">全选</button>
+                        <button class="btn btn-warning" id="reselectBtn" style="margin-left:10px;">重新选择PDF</button>
                     </div>
                 </div>
                 <div class="preview-grid" id="previewGrid">
@@ -112,6 +118,57 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+    // 控制清理缓存按钮只在上传界面显示
+    function updateClearCacheBtnVisibility() {
+        var btn = document.getElementById('clearCacheBtn');
+        var uploadSection = document.getElementById('uploadSection');
+        if(btn && uploadSection) {
+            btn.style.display = uploadSection.style.display !== 'none' ? '' : 'none';
+        }
+    }
+    // 监听主界面切换
+    const observer = new MutationObserver(updateClearCacheBtnVisibility);
+    observer.observe(document.getElementById('uploadSection'), {attributes: true, attributeFilter: ['style']});
+    document.addEventListener('DOMContentLoaded', updateClearCacheBtnVisibility);
+    document.getElementById('shutdownBtn').onclick = function() {
+        if(confirm('确定要关闭程序并退出吗？')) {
+            fetch('/shutdown', {method: 'POST'})
+                .then(res => res.text())
+                .then(msg => { 
+                    alert('服务器已关闭！如网页未自动关闭，请手动关闭此页面。');
+                    window.close();
+                })
+                .catch(() => {
+                    alert('服务器已关闭！如网页未自动关闭，请手动关闭此页面。');
+                    window.close();
+                });
+        }
+    };
+    function bindClearCacheBtn(btnId) {
+        var btn = document.getElementById(btnId);
+        if(btn) {
+            btn.onclick = function() {
+                if(confirm('确定要清理所有缓存文件吗？')) {
+                    fetch('/clear_cache', {method: 'POST'})
+                        .then(res => res.json())
+                        .then(data => {
+                            if(data.success) {
+                                alert(data.message);
+                            } else {
+                                alert('清理失败：' + data.message);
+                            }
+                        })
+                        .catch(() => alert('请求失败，请重试。'));
+                }
+            };
+        }
+    }
+    bindClearCacheBtn('clearCacheBtn');
+    document.getElementById('reselectBtn').onclick = function() {
+        resetApp();
+    };
+    </script>
     <footer class="footer">
         <a href="https://github.com/tinsyding" target="_blank" class="author-btn">
             <i class="fab fa-github"></i> 访问作者主页

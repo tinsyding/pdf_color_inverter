@@ -6,14 +6,22 @@ import io
 import datetime
 import uuid
 import platform
+import signal
+import shutil
 
-app = Flask(__name__, static_folder='static', template_folder='templates')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+app = Flask(
+    __name__,
+    static_folder=os.path.join(BASE_DIR, 'static'),
+    template_folder=os.path.join(BASE_DIR, 'templates')
+)
 
 # 配置
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB 最大文件大小
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['THUMBNAIL_FOLDER'] = 'static/thumbnails'
-app.config['OUTPUT_FOLDER'] = 'outputs'
+app.config['UPLOAD_FOLDER'] = os.path.join(BASE_DIR, 'uploads')
+app.config['THUMBNAIL_FOLDER'] = os.path.join(BASE_DIR, 'static', 'thumbnails')
+app.config['OUTPUT_FOLDER'] = os.path.join(BASE_DIR, 'outputs')
 
 # 确保目录存在
 for folder in [app.config['UPLOAD_FOLDER'], app.config['THUMBNAIL_FOLDER'], app.config['OUTPUT_FOLDER']]:
@@ -121,6 +129,31 @@ def download_file(filename):
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
+@app.route('/clear_cache', methods=['POST'])
+def clear_cache():
+    try:
+        cleared = []
+        for folder in [app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'], app.config['THUMBNAIL_FOLDER']]:
+            for filename in os.listdir(folder):
+                file_path = os.path.join(folder, filename)
+                try:
+                    if os.path.isfile(file_path) or os.path.islink(file_path):
+                        os.unlink(file_path)
+                        cleared.append(file_path)
+                    elif os.path.isdir(file_path):
+                        shutil.rmtree(file_path)
+                        cleared.append(file_path)
+                except Exception as e:
+                    print(f'无法删除 {file_path}: {e}')
+        return jsonify({'success': True, 'message': f'已清理 {len(cleared)} 个缓存文件'}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/shutdown', methods=['POST'])
+def shutdown():
+    os.kill(os.getpid(), signal.SIGTERM)
+    return '服务器正在关闭...'
+
 def generate_thumbnails(pdf_path, file_id):
     """生成PDF页面缩略图"""
     thumbnails = []
@@ -187,4 +220,4 @@ def process_pdf_colors(input_path, output_path, selected_pages, dpi=300):
         raise Exception(f"处理PDF时发生错误: {e}")
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000) 
+    app.run(debug=False, host='0.0.0.0', port=4999) 

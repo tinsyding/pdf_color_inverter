@@ -127,3 +127,7 @@ Thumbs.db
 # 日志文件
 *.log
 logs/ 
+package/
+setup.iss
+PDFColorInverterSetup.exe
+logo.ico
