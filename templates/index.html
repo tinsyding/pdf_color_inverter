@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF 页面反色工具</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="globalLoading">
+        <div style="text-align:center;">
+            <div class="loading" style="margin-bottom:16px;"></div>
+            <div style="font-size:1.2rem;color:#333;">正在加载PDF，请稍候...</div>
+        </div>
+    </div>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-file-pdf"></i>
+                    <h1>PDF 页面反色工具</h1>
+                </div>
+                <p class="subtitle">将PDF页面颜色反转，适合夜间阅读</p>
+            </div>
+        </header>
+
+        <!-- 主要内容 -->
+        <main class="main-content">
+            <!-- 步骤指示器 -->
+            <div class="steps">
+                <div class="step active" id="step1">
+                    <div class="step-number">1</div>
+                    <div class="step-text">选择PDF文件</div>
+                </div>
+                <div class="step" id="step2">
+                    <div class="step-number">2</div>
+                    <div class="step-text">选择页面</div>
+                </div>
+                <div class="step" id="step3">
+                    <div class="step-number">3</div>
+                    <div class="step-text">处理完成</div>
+                </div>
+            </div>
+
+            <!-- 文件上传区域 -->
+            <div class="upload-section" id="uploadSection">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-content">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>选择PDF文件</h3>
+                        <p>拖拽文件到此处或点击选择</p>
+                        <input type="file" id="pdfFile" accept=".pdf" style="display: none;">
+                        <button class="btn btn-primary" onclick="event.stopPropagation();document.getElementById('pdfFile').click()">
+                            选择文件
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 预览区域 -->
+            <div class="preview-section" id="previewSection" style="display: none;">
+                <div class="preview-header">
+                    <h3>选择要反色的页面</h3>
+                    <div class="preview-controls">
+                        <button class="btn btn-secondary" id="toggleSelectBtn" onclick="toggleSelectAll()">全选</button>
+                    </div>
+                </div>
+                <div class="preview-grid" id="previewGrid">
+                    <!-- 页面缩略图将在这里动态生成 -->
+                </div>
+                <div class="preview-actions">
+                    <button class="btn btn-primary" onclick="processPDF()" id="processBtn">
+                        <i class="fas fa-magic"></i>
+                        开始处理
+                    </button>
+                </div>
+            </div>
+
+            <!-- 处理进度 -->
+            <div class="progress-section" id="progressSection" style="display: none;">
+                <div class="progress-content">
+                    <i class="fas fa-cog fa-spin"></i>
+                    <h3>正在处理PDF...</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p id="progressText">初始化中...</p>
+                </div>
+            </div>
+
+            <!-- 结果区域 -->
+            <div class="result-section" id="resultSection" style="display: none;">
+                <div class="result-content">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>处理完成！</h3>
+                    <p id="resultText">PDF已成功处理</p>
+                    <div class="result-actions">
+                        <button class="btn btn-success" onclick="downloadFile()">
+                            <i class="fas fa-download"></i>
+                            下载文件
+                        </button>
+                        <button class="btn btn-secondary" onclick="resetApp()">
+                            <i class="fas fa-redo"></i>
+                            处理新文件
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <footer class="footer">
+        <a href="https://github.com/tinsyding" target="_blank" class="author-btn">
+            <i class="fab fa-github"></i> 访问作者主页
+        </a>
+    </footer>
+</body>
+</html> 
