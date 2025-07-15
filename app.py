@@ -89,36 +89,26 @@ def process_pdf():
     try:
         data = request.get_json()
         selected_pages = data.get('selectedPages', [])
-        
+        file_id = data.get('file_id')
         if not selected_pages:
             return jsonify({'success': False, 'error': '请选择要处理的页面'})
-        
-        # 这里应该从session或请求中获取file_id
-        # 简化处理，假设只有一个文件
-        file_id = list(session_files.keys())[0] if session_files else None
-        if not file_id:
+        if not file_id or file_id not in session_files:
             return jsonify({'success': False, 'error': '未找到上传的文件'})
-        
         file_info = session_files[file_id]
         input_path = file_info['filepath']
-        
         # 生成输出文件名
         base_name = os.path.splitext(file_info['original_name'])[0]
         output_filename = f"{base_name}_反色_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
         output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
-        
         # 处理PDF
         process_pdf_colors(input_path, output_path, selected_pages)
-        
         # 返回下载链接
         download_url = f"/download/{output_filename}"
-        
         return jsonify({
             'success': True,
             'downloadUrl': download_url,
             'message': f'成功处理 {len(selected_pages)} 页，文件已保存为 {output_filename}'
         })
-        
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 

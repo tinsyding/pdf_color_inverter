@@ -2,6 +2,7 @@
 let currentFile = null;
 let selectedPages = [];
 let processedFileUrl = null;
+let currentFileId = null; // 新增：保存当前file_id
 
 // DOM 元素
 const uploadSection = document.getElementById('uploadSection');
@@ -91,6 +92,7 @@ async function uploadFile(file) {
         
         if (data.success) {
             currentFile = file;
+            currentFileId = data.file_id; // 新增：保存file_id
             showPreview(data.thumbnails, data.totalPages);
             updateStep(2);
         } else {
@@ -218,7 +220,10 @@ async function processPDF() {
         showError('请至少选择一页进行处理');
         return;
     }
-    
+    if (!currentFileId) {
+        showError('未找到上传的PDF文件，请重新上传');
+        return;
+    }
     try {
         showProgress();
         updateStep(3);
@@ -229,6 +234,7 @@ async function processPDF() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                file_id: currentFileId, // 新增：传递file_id
                 selectedPages: selectedPages
             })
         });
@@ -305,6 +311,7 @@ function resetApp() {
     currentFile = null;
     selectedPages = [];
     processedFileUrl = null;
+    currentFileId = null; // 新增：重置file_id
     
     // 重置UI
     uploadSection.style.display = 'block';
