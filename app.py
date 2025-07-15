@@ -21,7 +21,7 @@ app = Flask(
 app.secret_key = 'tinsy_key_level_1'
 
 # 配置
-app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB 最大文件大小
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB 最大文件大小
 app.config['UPLOAD_FOLDER'] = os.path.join(BASE_DIR, 'uploads')
 app.config['THUMBNAIL_FOLDER'] = os.path.join(BASE_DIR, 'static', 'thumbnails')
 app.config['OUTPUT_FOLDER'] = os.path.join(BASE_DIR, 'outputs')
