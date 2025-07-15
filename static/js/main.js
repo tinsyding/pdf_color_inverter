@@ -36,10 +36,16 @@ function initializeEventListeners() {
 // 处理文件选择
 function handleFileSelect(event) {
     const file = event.target.files[0];
-    if (file && file.type === 'application/pdf') {
-        uploadFile(file);
-    } else {
-        showError('请选择有效的PDF文件');
+    if (file) {
+        if (file.size > 10 * 1024 * 1024) {
+            showError('PDF文件不得大于10MB');
+            return;
+        }
+        if (file.type === 'application/pdf') {
+            uploadFile(file);
+        } else {
+            showError('请选择有效的PDF文件');
+        }
     }
 }
 
@@ -63,6 +69,10 @@ function handleDrop(event) {
     const files = event.dataTransfer.files;
     if (files.length > 0) {
         const file = files[0];
+        if (file.size > 10 * 1024 * 1024) {
+            showError('PDF文件不得大于10MB');
+            return;
+        }
         if (file.type === 'application/pdf') {
             uploadFile(file);
         } else {

@@ -52,7 +52,12 @@ def upload_pdf():
         
         if not file.filename.lower().endswith('.pdf'):
             return jsonify({'success': False, 'error': '请选择PDF文件'})
-        
+        # 新增：判断文件大小是否超过10MB
+        file.seek(0, os.SEEK_END)
+        file_length = file.tell()
+        file.seek(0)
+        if file_length > 10 * 1024 * 1024:
+            return jsonify({'success': False, 'error': 'PDF文件不得大于10MB'})
         # 生成唯一文件名
         file_id = str(uuid.uuid4())
         filename = f"{file_id}.pdf"
